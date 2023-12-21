@@ -10,12 +10,29 @@ import { useState } from "react";
 //so the app component will manage the state to keep track of whose turn is
 
 function App() {
+  const [gameTurns, setGameTurns] = useState([]);
   const [activePlayer, setActivePlayer] = useState("X");
 
-  function handleSelectSquare() {
+  function handleSelectSquare(row, column) {
     setActivePlayer((currentActivePlayer) =>
       currentActivePlayer === "X" ? "O" : "X"
     );
+    setGameTurns((prevTurns) => {
+      let currentPlayer = "X";
+      if (prevTurns.length > 0 && prevTurns[0].player === "X") {
+        //so instead of trusting that activePlayer is updated(since it comes from another state)
+        //we can take advantage that the game always starts from X and then checking the last object
+        //if the last object data has an X, this one needs to be an O and vice-versa
+        currentPlayer = "O";
+      }
+      //instead of doing player: activePlayer we should add a let inside this function
+      const updatedTurns = [
+        { square: { row: row, column: column }, player: currentPlayer },
+        ...prevTurns,
+      ];
+
+      return updatedTurns;
+    });
   }
 
   return (
@@ -33,10 +50,7 @@ function App() {
             isActive={activePlayer === "O"}
           />
         </ol>
-        <GameBoard
-          onSelectSquare={handleSelectSquare}
-          activePlayerSymbol={activePlayer}
-        />
+        <GameBoard onSelectSquare={handleSelectSquare} turns={gameTurns} />
       </div>
     </main>
   );
