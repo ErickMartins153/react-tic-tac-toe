@@ -1,7 +1,8 @@
 import Player from "./components/Player";
 import GameBoard from "./components/GameBoard";
-import { useState } from "react";
 import Log from "./components/Log";
+import Gameover from "./Gameover";
+import { useState } from "react";
 import { WINNING_COMBINATIONS } from "./winning-combinations";
 
 //we moved this and the logic to print the gameboard to the App component
@@ -105,7 +106,7 @@ function App() {
             isActive={activePlayer === "O"}
           />
         </ol>
-        {winner && <p>You won, {winner}!</p>}
+        {winner && <Gameover winner={winner} />}
         <GameBoard onSelectSquare={handleSelectSquare} board={gameBoard} />
       </div>
       <Log turns={gameTurns} />
