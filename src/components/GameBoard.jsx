@@ -1,20 +1,4 @@
-const initialGameBoard = [
-  [null, null, null],
-  [null, null, null],
-  [null, null, null],
-];
-
-export default function GameBoard({ onSelectSquare, turns }) {
-  let gameBoard = initialGameBoard;
-
-  //instead of managing the state like before we're deriving state here
-  for (const turn of turns) {
-    const { square, player } = turn;
-    const { row, column } = square;
-    gameBoard[row][column] = player;
-    //gameBoard is a computed value that is derived from some state(gameTurns)
-  }
-
+export default function GameBoard({ onSelectSquare, board }) {
   //we're going to manage the gameBoard situation on the App component, by the gameTurns one
   //because the Log component also need some of those infos, and the App is a parent for both
   //we're going to improve the way of doing it
@@ -47,12 +31,15 @@ export default function GameBoard({ onSelectSquare, turns }) {
 
   return (
     <ol id="game-board">
-      {gameBoard.map((row, rowIndex) => (
+      {board.map((row, rowIndex) => (
         <li key={rowIndex}>
           <ol>
             {row.map((playerSymbol, colIndex) => (
               <li key={colIndex}>
-                <button onClick={() => onSelectSquare(rowIndex, colIndex)}>
+                <button
+                  onClick={() => onSelectSquare(rowIndex, colIndex)}
+                  disabled={playerSymbol !== null}
+                >
                   {playerSymbol}
                 </button>
               </li>

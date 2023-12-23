@@ -2,6 +2,16 @@ import Player from "./components/Player";
 import GameBoard from "./components/GameBoard";
 import { useState } from "react";
 import Log from "./components/Log";
+import { WINNING_COMBINATIONS } from "./winning-combinations";
+
+//we moved this and the logic to print the gameboard to the App component
+//having the gameboard here allows us to check the symbol on each square and
+//get a winner
+const initialGameBoard = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null],
+];
 
 //here we'll use from a concept called lifting state up
 //we need to keep track of who should play, and this info can't go
@@ -13,10 +23,11 @@ import Log from "./components/Log";
 //this helper function is outside the component because it wont need access to any state or data related
 //to that component, and it also shouldnt be recreated when the component rerenders
 function deriveActivePlayer(gameTurns) {
-  /* ok since we moved it to a function ignore the following comments */
+  /* ok since we moved it to a function ignore the following comments 
 
   //even tho the code is almost the same as the one in handleSelectSquare we cant remove it from there
   //because we need to derive the state from the old state, and here we're getting from the current
+*/
 
   let currentPlayer = "X"; //so now we're deriving the symbol from gameTurns
   //instead of getting it from the setGameTurns arrow function way, we can get the currently
@@ -34,6 +45,35 @@ function App() {
 
   const activePlayer = deriveActivePlayer(gameTurns);
 
+  let gameBoard = initialGameBoard;
+  //instead of managing the state like before we're deriving state here
+  for (const turn of gameTurns) {
+    const { square, player } = turn;
+    const { row, column } = square;
+    gameBoard[row][column] = player;
+    //gameBoard is a computed value that is derived from some state(gameTurns)
+  }
+
+  let winner;
+
+  //lets derive if we have a winner from gameTurns
+  for (const combination of WINNING_COMBINATIONS) {
+    //we could add some logic to just check when it was possible to have played at least 3 times
+    //but since the combinations are so little it really isnt a problem to check it always
+    const firstSquareSymbol =
+      gameBoard[combination[0].row][combination[0].column];
+    const secondSquareSymbol =
+      gameBoard[combination[1].row][combination[1].column];
+    const thirdSquareSymbol =
+      gameBoard[combination[2].row][combination[2].column];
+    if (
+      firstSquareSymbol &&
+      firstSquareSymbol === secondSquareSymbol &&
+      firstSquareSymbol === thirdSquareSymbol
+    ) {
+      winner = firstSquareSymbol;
+    }
+  }
   function handleSelectSquare(row, column) {
     //setActivePlayer((currentActivePlayer) =>currentActivePlayer === "X" ? "O" : "X");
     setGameTurns((prevTurns) => {
@@ -65,7 +105,8 @@ function App() {
             isActive={activePlayer === "O"}
           />
         </ol>
-        <GameBoard onSelectSquare={handleSelectSquare} turns={gameTurns} />
+        {winner && <p>You won, {winner}!</p>}
+        <GameBoard onSelectSquare={handleSelectSquare} board={gameBoard} />
       </div>
       <Log turns={gameTurns} />
     </main>
