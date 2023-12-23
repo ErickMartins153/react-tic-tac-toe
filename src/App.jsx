@@ -39,6 +39,8 @@ function deriveActivePlayer(gameTurns) {
 }
 
 function App() {
+  //in order to get the player name here in App and use it in Gameover we need this
+  const [players, setPlayers] = useState({ X: "Player 1", O: "Player 2" });
   const [gameTurns, setGameTurns] = useState([]);
   //since we're using gameTurns state, this component is already updated by the square click
   //so we can remove this activePlayer and change the logic, getting it from gameTurns
@@ -72,7 +74,7 @@ function App() {
       firstSquareSymbol === secondSquareSymbol &&
       firstSquareSymbol === thirdSquareSymbol
     ) {
-      winner = firstSquareSymbol;
+      winner = players[firstSquareSymbol];
     }
   }
 
@@ -98,6 +100,12 @@ function App() {
     setGameTurns([]);
   }
 
+  function handlePlayerNameChange(symbol, newName) {
+    setPlayers((prevPlayers) => {
+      //this way we'll copy the old objct and overwrite the symbol key with the new value
+      return { ...prevPlayers, [symbol]: [newName] };
+    });
+  }
   return (
     <main>
       <div id="game-container">
@@ -106,11 +114,13 @@ function App() {
             initialName="Player 1"
             symbol="X"
             isActive={activePlayer === "X"}
+            onChangeName={handlePlayerNameChange}
           />
           <Player
             initialName="Player 2"
             symbol="O"
             isActive={activePlayer === "O"}
+            onChangeName={handlePlayerNameChange}
           />
         </ol>
         {(winner || hasDraw) && (
